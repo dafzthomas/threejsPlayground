@@ -37,9 +37,9 @@
         alpha: true
     });
 
-    controls.damping = 10;
-
     camera.position.z = 5;
+    controls.minDistance = 5;
+    controls.maxDistance = 50;
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
