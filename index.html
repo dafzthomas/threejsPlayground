@@ -10,50 +10,8 @@
     </head>
     <body>
         <script src="js/three.min.js"></script>
-        <script>
-            // My JS!!!!
-            let scene = new THREE.Scene();
-            let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-            camera.position.z = 5;
-            
-            let clock = new THREE.Clock();
-
-            let renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            let cameraControls = new THREE.TrackballControls(camera, renderer.domElement);
-            cameraControls.target.set(0, 0, 0);
-
-            let geometry = new THREE.BoxGeometry(2, 2, 2);
-            let material = new THREE.MeshBasicMaterial({
-                color: 0xFFFFFF,
-                wireframe: true,
-                wireframe_linewidth: 10
-            });
-            let cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
-
-            // cube.rotation.x = 0.5;
-
-            let onMouseMove = function (event) {
-                console.log('Moving mouse');
-            }
-
-            let render = function () {
-                var delta = clock.getDelta();
-                requestAnimationFrame(render);
-                cameraControls.update(delta);
-
-                // cube.rotation.y += 0.01;
-                // cube.rotation.x += 0.01;
-
-                renderer.render(scene, camera);
-                stats.update();
-            }
-
-            render();
-
-        </script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/controls/Stats.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
