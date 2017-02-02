@@ -1,15 +1,6 @@
 (function() {
 
-    let scene,
-        camera,
-        renderer,
-        clock,
-        controls,
-        stats,
-        textureLoader,
-        light,
-        prevTime,
-        velocity,
+    let prevTime,
         controlsEnabled = false,
         moveForward = false,
         moveBackward = false,
@@ -18,47 +9,47 @@
         holdShift = false,
         canJump = false;
 
+    let objects = [];
+
+    let renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor( 0xffffff );
+	renderer.setPixelRatio( window.devicePixelRatio );
+    document.body.appendChild(renderer.domElement);
+
+    let textureLoader = new THREE.TextureLoader();
+    let scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0xffffff, 0, 500);
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    let light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+    light.position.set(0.5, 1, 0.75);
+    scene.add(light);
+
+    let velocity = new THREE.Vector3();
+    let clock = new THREE.Clock();
+
+    let raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10);
+
     let havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
     let blocker = document.getElementById('blocker');
 	let instructions = document.getElementById('instructions');
 
-    let objects = [];
-    let raycaster;
-
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-
-    scene = new THREE.Scene();
-    scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
-
-    light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
-	light.position.set(0.5, 1, 0.75);
-	scene.add(light);
-
-    velocity = new THREE.Vector3();
-    clock = new THREE.Clock();
-
-    controls = new THREE.PointerLockControls(camera);
+    let controls = new THREE.PointerLockControls(camera);
     scene.add(controls.getObject());
-    renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true
-    });
-    textureLoader = new THREE.TextureLoader();
 
-
-
-    activatePointerLock();
+    let stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    stats.domElement.style.zIndex = 100;
+    document.body.appendChild(stats.domElement);
 
     document.addEventListener('keydown', onKeyDown, false);
 	document.addEventListener('keyup', onKeyUp, false);
-
-    raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10);
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor( 0xffffff );
-	renderer.setPixelRatio( window.devicePixelRatio );
-    document.body.appendChild(renderer.domElement);
 
     // Floor
     var floor = {
@@ -84,7 +75,6 @@
 
     floorMesh = new THREE.Mesh( floor.geometry, floor.material );
     scene.add(floorMesh);
-
 
     // Objects
 
@@ -115,12 +105,7 @@
 
 	}
 
-    // Stats Element
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.top = '0px';
-    stats.domElement.style.zIndex = 100;
-    document.body.appendChild(stats.domElement);
+    activatePointerLock();
 
     function render () {
         requestAnimationFrame(render);
@@ -151,9 +136,7 @@
     			if (moveLeft) velocity.x -= 400 * delta;
     			if (moveRight) velocity.x += 400 * delta;
             }
-
-
-
+            
 			if (isOnObject === true) {
 				velocity.y = Math.max( 0, velocity.y );
 
